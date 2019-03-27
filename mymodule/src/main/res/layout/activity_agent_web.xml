@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"></LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp">
+
+        <Button
+            android:id="@+id/btn_goback"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:drawableTop="@mipmap/ic_web_back"
+            android:text="后退"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/btn_forwarck"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:drawableTop="@mipmap/ic_web_forwack"
+            android:text="前进"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/btn_reload"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:drawableTop="@mipmap/ic_web_reload"
+            android:text="刷新"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+</LinearLayout>
