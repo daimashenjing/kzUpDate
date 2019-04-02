@@ -103,18 +103,24 @@ public class DownloadService extends Service {
             channel.enableLights(false);
 
             mNotificationManager.createNotificationChannel(channel);
+
+
         }
 
+//        try {
+//            mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID);
+//            mBuilder.setContentTitle("开始下载")
+//                    .setContentText("正在连接服务器")
+//                    .setSmallIcon(R.mipmap.lib_update_app_update_icon)
+//                    .setLargeIcon(AppUpdateUtils.drawableToBitmap(AppUpdateUtils.getAppIcon(DownloadService.this)))
+//                    .setOngoing(true)
+//                    .setAutoCancel(true)
+//                    .setWhen(System.currentTimeMillis());
+//            mNotificationManager.notify(NOTIFY_ID, mBuilder.build());
+//        } catch (Exception e) {
+//        }
 
-        mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID);
-        mBuilder.setContentTitle("开始下载")
-                .setContentText("正在连接服务器")
-                .setSmallIcon(R.mipmap.lib_update_app_update_icon)
-                .setLargeIcon(AppUpdateUtils.drawableToBitmap(AppUpdateUtils.getAppIcon(DownloadService.this)))
-                .setOngoing(true)
-                .setAutoCancel(true)
-                .setWhen(System.currentTimeMillis());
-        mNotificationManager.notify(NOTIFY_ID, mBuilder.build());
+
     }
 
     /**

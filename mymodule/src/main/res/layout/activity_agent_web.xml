@@ -14,37 +14,71 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp">
+        android:layout_height="50dp"
+        android:gravity="center_vertical">
 
-        <Button
-            android:id="@+id/btn_goback"
+        <LinearLayout
+            android:id="@+id/layout_goback"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:drawableTop="@mipmap/ic_web_back"
-            android:text="后退"
-            android:textSize="12sp" />
+            android:gravity="center"
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/btn_forwarck"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:drawableTop="@mipmap/ic_web_forwack"
-            android:text="前进"
-            android:textSize="12sp" />
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@mipmap/ic_web_back" />
 
-        <Button
-            android:id="@+id/btn_reload"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="后退" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/layout_forwork"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:drawableTop="@mipmap/ic_web_reload"
-            android:text="刷新"
-            android:textSize="12sp" />
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@mipmap/ic_web_forwack" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="前进" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/layout_reload"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@mipmap/ic_web_reload" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="刷新" />
+
+        </LinearLayout>
+
 
     </LinearLayout>
 </LinearLayout>

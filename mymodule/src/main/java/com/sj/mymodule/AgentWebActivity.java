@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -13,6 +14,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.avos.avoscloud.LogUtil;
 import com.just.agentweb.AgentWeb;
 import com.just.agentweb.DefaultWebClient;
 import com.tbruyelle.rxpermissions.RxPermissions;
@@ -30,11 +32,14 @@ public class AgentWebActivity extends AppCompatActivity implements View.OnClickL
 
     private AgentWeb mAgentWeb;
     private LinearLayout container;
-    private Button btn_goback, btn_forwarck, btn_reload;
+    private LinearLayout layout_goback, layout_forwarck, layout_reload;
     public static String URL = "URL";
     public static String UPDATEURL = "updateUrl";
+    public static String MODLETYPE = "modletype";
+    public static String IMAGEURL = "image";
     private String url;
     private String updateUrl;
+    private String imageUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,13 +47,15 @@ public class AgentWebActivity extends AppCompatActivity implements View.OnClickL
         setContentView(R.layout.activity_agent_web);
         url = getIntent().getStringExtra(URL);
         updateUrl = getIntent().getStringExtra(UPDATEURL);
-        container = findViewById(R.id.container);
-        btn_goback = findViewById(R.id.btn_goback);
-        btn_forwarck = findViewById(R.id.btn_forwarck);
-        btn_reload = findViewById(R.id.btn_reload);
-        btn_goback.setOnClickListener(this);
-        btn_forwarck.setOnClickListener(this);
-        btn_reload.setOnClickListener(this);
+        imageUrl = getIntent().getStringExtra(IMAGEURL);
+        Log.i("test", "图片" + imageUrl);
+        container = (LinearLayout) findViewById(R.id.container);
+        layout_goback = (LinearLayout) findViewById(R.id.layout_goback);
+        layout_forwarck = (LinearLayout) findViewById(R.id.layout_forwork);
+        layout_reload = (LinearLayout) findViewById(R.id.layout_reload);
+        layout_goback.setOnClickListener(this);
+        layout_forwarck.setOnClickListener(this);
+        layout_reload.setOnClickListener(this);
         mAgentWeb = AgentWeb.with(this)
                 .setAgentWebParent(container, new LinearLayout.LayoutParams(-1, -1))
                 .useDefaultIndicator()
@@ -98,7 +105,7 @@ public class AgentWebActivity extends AppCompatActivity implements View.OnClickL
                 });
     }
 
-    private void update(String url) {
+    private void update(final String url) {
         UpdateAppBean updateAppBean = new UpdateAppBean();
         //设置 apk 的下载地址
         updateAppBean.setApkFileUrl(url);
@@ -122,12 +129,12 @@ public class AgentWebActivity extends AppCompatActivity implements View.OnClickL
         UpdateAppManager.download(this, updateAppBean, new DownloadService.DownloadCallback() {
             @Override
             public void onStart() {
-                HProgressDialogUtils.showHorizontalProgressDialog(AgentWebActivity.this, "下载进度", false);
+                DownDialogUtils.showHorizontalProgressDialog(AgentWebActivity.this, imageUrl);
             }
 
             @Override
             public void onProgress(float progress, long totalSize) {
-                HProgressDialogUtils.setProgress(Math.round(progress * 100));
+                DownDialogUtils.setProgress(Math.round(progress * 100));
             }
 
             @Override
@@ -154,11 +161,11 @@ public class AgentWebActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.btn_forwarck) {
+        if (v.getId() == R.id.layout_forwork) {
             mAgentWeb.getWebCreator().getWebView().goForward();
-        } else if (v.getId() == R.id.btn_goback) {
+        } else if (v.getId() == R.id.layout_goback) {
             mAgentWeb.getWebCreator().getWebView().goBack();
-        } else if (v.getId() == R.id.btn_reload) {
+        } else if (v.getId() == R.id.layout_reload) {
             mAgentWeb.getWebCreator().getWebView().reload();
         }
     }

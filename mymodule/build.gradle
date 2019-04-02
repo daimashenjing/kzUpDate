@@ -3,7 +3,7 @@ apply plugin: 'com.android.library'
 android {
     compileSdkVersion 28
     defaultConfig {
-        minSdkVersion 15
+        minSdkVersion 14
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -21,10 +21,43 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    sourceSets {  //this one may not be needed. But wont hurt.
+        androidTest.setRoot('src/androidTest')
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+}
+
+android.libraryVariants.all { variant ->
+    def name = variant.buildType.name
+    def task = project.tasks.create "jar${name.capitalize()}", Jar
+    task.dependsOn variant.javaCompile
+    task.from variant.javaCompile.destinationDir
+    task.exclude '**/BuildConfig.class'
+    task.exclude '**/R.class'
+    task.exclude '**/R$*.class'
+    artifacts.add('archives', task);
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:28.0.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
@@ -34,5 +67,10 @@ dependencies {
     compile 'com.qianwen:okhttp-utils:3.8.0'
     compile 'com.tbruyelle.rxpermissions:rxpermissions:0.9.4@aar'
     compile 'io.reactivex:rxandroid:1.2.1'
-    compile project(':avoscloud-sdk')
+    //    compile project(':avoscloud-sdk')
+    compile 'com.squareup.okhttp3:okhttp:3.8.1'
+    compile 'com.alibaba:fastjson:1.2.37'
+    testCompile 'org.robolectric:robolectric:3.1.4'
+    testCompile 'org.mockito:mockito-core:1.10.19'
+    implementation files('libs/universal-image-loader-1.9.5.jar')
 }
