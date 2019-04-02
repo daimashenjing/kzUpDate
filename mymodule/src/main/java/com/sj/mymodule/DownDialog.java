@@ -50,7 +50,7 @@ public class DownDialog extends Dialog {
         if (image_banner != null) {
             if (!TextUtils.isEmpty(url)) {
                 image_banner.setVisibility(View.VISIBLE);
-                ImageLoadProxy.displayImageList(url, image_banner, R.mipmap.ic_down_defult, null, null);
+                ImageLoadProxy.displayImageList(url, image_banner, R.color.transien, null, null);
             } else {
                 image_banner.setVisibility(View.GONE);
             }

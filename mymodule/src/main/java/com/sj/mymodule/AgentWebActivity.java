@@ -1,6 +1,7 @@
 package com.sj.mymodule;
 
 import android.Manifest;
+import android.app.Activity;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
@@ -28,7 +29,7 @@ import rx.Observer;
 
 import static android.view.KeyEvent.KEYCODE_BACK;
 
-public class AgentWebActivity extends AppCompatActivity implements View.OnClickListener {
+public class AgentWebActivity extends Activity implements View.OnClickListener {
 
     private AgentWeb mAgentWeb;
     private LinearLayout container;
