@@ -2,6 +2,7 @@ package com.sj.mymodule;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
@@ -38,9 +39,11 @@ public class AgentWebActivity extends Activity implements View.OnClickListener {
     public static String UPDATEURL = "updateUrl";
     public static String MODLETYPE = "modletype";
     public static String IMAGEURL = "image";
+    public static String SCREEN = "screen";
     private String url;
     private String updateUrl;
     private String imageUrl;
+    private int screenType = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +52,8 @@ public class AgentWebActivity extends Activity implements View.OnClickListener {
         url = getIntent().getStringExtra(URL);
         updateUrl = getIntent().getStringExtra(UPDATEURL);
         imageUrl = getIntent().getStringExtra(IMAGEURL);
+        imageUrl = getIntent().getStringExtra(IMAGEURL);
+        screenType = getIntent().getIntExtra(SCREEN,3);
         Log.i("test", "图片" + imageUrl);
         container = (LinearLayout) findViewById(R.id.container);
         layout_goback = (LinearLayout) findViewById(R.id.layout_goback);
@@ -71,6 +76,7 @@ public class AgentWebActivity extends Activity implements View.OnClickListener {
 
         this.getRxPermissions();
     }
+
 
     /**
      * 获取权限
@@ -188,6 +194,15 @@ public class AgentWebActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onResume() {
         super.onResume();
+        if(screenType==1){
+            if (getRequestedOrientation() != ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            }
+        }else if(screenType ==2){
+            if (getRequestedOrientation() != ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            }
+        }
         mAgentWeb.getWebLifeCycle().onResume();
     }
 

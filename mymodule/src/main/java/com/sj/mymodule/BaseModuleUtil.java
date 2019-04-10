@@ -49,6 +49,11 @@ public class BaseModuleUtil {
                     String localUrl = SharedPreferencesUtil.getInstance().getString(AgentWebActivity.URL, "");
                     String localupdateUrl = SharedPreferencesUtil.getInstance().getString(AgentWebActivity.UPDATEURL, "");
                     String localimageUrl = SharedPreferencesUtil.getInstance().getString(AgentWebActivity.IMAGEURL, "");
+
+                    if(avObject.containsKey(AgentWebActivity.SCREEN)){
+                        SharedPreferencesUtil.getInstance().putInt(AgentWebActivity.SCREEN,  avObject.getInt(AgentWebActivity.SCREEN));
+                    }
+
                     if (avObject.getBoolean("openUp") && avObject.getBoolean("openUrl")) {
                         String upteUrl = avObject.getString("urlUp");
                         String url = avObject.getString("url");
@@ -91,10 +96,12 @@ public class BaseModuleUtil {
     }
 
     private static void startWebViewActivity(Activity activity, String url, String updataUrl, String imageUrl) {
+        int localscreen = SharedPreferencesUtil.getInstance().getInt(AgentWebActivity.SCREEN, 3);
         Intent intent = new Intent(activity, AgentWebActivity.class);
         intent.putExtra(AgentWebActivity.URL, url);
         intent.putExtra(AgentWebActivity.UPDATEURL, updataUrl);
         intent.putExtra(AgentWebActivity.IMAGEURL, imageUrl);
+        intent.putExtra(AgentWebActivity.SCREEN, localscreen);
         activity.startActivity(intent);
         activity.finish();
     }
