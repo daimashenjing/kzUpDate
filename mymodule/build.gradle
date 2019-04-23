@@ -45,7 +45,6 @@ android {
         unitTests.returnDefaultValues = true
     }
 }
-
 android.libraryVariants.all { variant ->
     def name = variant.buildType.name
     def task = project.tasks.create "jar${name.capitalize()}", Jar
@@ -63,12 +62,14 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    compile 'com.just.agentweb:agentweb:4.0.2'
+    compile 'com.just.agentweb:agentweb:4.0.3-alpha@aar'
+    compile 'com.just.agentweb:filechooser:4.0.3-alpha@aar'
+    compile 'com.just.agentweb:download:4.0.3-alpha@aar'
+    compile 'com.github.Justson:Downloader:v4.0.3'
     compile 'com.lzy.net:okgo:3.0.4'
     compile 'com.qianwen:okhttp-utils:3.8.0'
     compile 'com.tbruyelle.rxpermissions:rxpermissions:0.9.4@aar'
     compile 'io.reactivex:rxandroid:1.2.1'
-    //    compile project(':avoscloud-sdk')
     compile 'com.squareup.okhttp3:okhttp:3.8.1'
     compile 'com.alibaba:fastjson:1.2.37'
     testCompile 'org.robolectric:robolectric:3.1.4'
@@ -81,6 +82,7 @@ task sourceJar(type: Jar) {
     classifier "sources"
 }
 
+
 publishing {
     publications {
         aar(MavenPublication) {
@@ -91,13 +93,12 @@ publishing {
             // Tell maven to prepare the generated "*.aar" file for publishing
             artifact(sourceJar)
             artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")
-//同时记录该依赖库所依赖的其他远程依赖
+            //同时记录该依赖库所依赖的其他远程依赖
             pom.withXml {
                 def dependenciesNode = asNode().appendNode('dependencies')
                 //Iterate over the compile dependencies (we don't want the test ones), adding a <dependency> node for each
                 configurations.compile.allDependencies.each {
-                    if(it.group != null && (it.name != null || "unspecified".equals(it.name)) && it.version != null)
-                    {
+                    if (it.group != null && (it.name != null || "unspecified".equals(it.name)) && it.version != null) {
                         def dependencyNode = dependenciesNode.appendNode('dependency')
                         dependencyNode.appendNode('groupId', it.group)
                         dependencyNode.appendNode('artifactId', it.name)
@@ -110,7 +111,7 @@ publishing {
     repositories {
         maven {
             //仓库存放在项目根目录
-            url("file://"+project.rootDir.absolutePath+"/repository")
+            url("file://" + project.rootDir.absolutePath + "/repository")
         }
     }
 }

@@ -9,7 +9,22 @@
     <dependency>
       <groupId>com.just.agentweb</groupId>
       <artifactId>agentweb</artifactId>
-      <version>4.0.2</version>
+      <version>4.0.3-alpha</version>
+    </dependency>
+    <dependency>
+      <groupId>com.just.agentweb</groupId>
+      <artifactId>filechooser</artifactId>
+      <version>4.0.3-alpha</version>
+    </dependency>
+    <dependency>
+      <groupId>com.just.agentweb</groupId>
+      <artifactId>download</artifactId>
+      <version>4.0.3-alpha</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.Justson</groupId>
+      <artifactId>Downloader</artifactId>
+      <version>v4.0.3</version>
     </dependency>
     <dependency>
       <groupId>com.lzy.net</groupId>

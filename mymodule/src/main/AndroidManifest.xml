@@ -7,7 +7,8 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
-    <application>
+    <application
+        android:usesCleartextTraffic="true">
         <service android:name="com.vector.update_app.service.DownloadService" />
         <provider
             android:name="com.vector.update_app.UpdateFileProvider"
@@ -18,6 +19,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/new_app_file_paths" />
         </provider>
-        <activity android:name="com.sj.mymodule.AgentWebActivity"/>
+        <activity android:name="com.sj.mymodule.AgentWebActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|orientation|screenLayout"/>
     </application>
 </manifest>

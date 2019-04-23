@@ -3,28 +3,49 @@ package com.sj.mymodule;
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v7.app.AppCompatActivity;
+import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
-import android.webkit.WebChromeClient;
-import android.widget.Button;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
+import android.webkit.WebView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.avos.avoscloud.LogUtil;
+import com.download.library.DownloadListenerAdapter;
+import com.download.library.Extra;
+import com.just.agentweb.AbsAgentWebSettings;
 import com.just.agentweb.AgentWeb;
 import com.just.agentweb.DefaultWebClient;
+import com.just.agentweb.IAgentWebSettings;
+import com.just.agentweb.LogUtils;
+import com.just.agentweb.MiddlewareWebChromeBase;
+import com.just.agentweb.MiddlewareWebClientBase;
+import com.just.agentweb.PermissionInterceptor;
+import com.just.agentweb.WebChromeClient;
+import com.just.agentweb.WebListenerManager;
+import com.just.agentweb.WebViewClient;
+import com.just.agentweb.download.DefaultDownloadImpl;
+import com.just.agentweb.download.DownloadListener;
 import com.tbruyelle.rxpermissions.RxPermissions;
 import com.vector.update_app.UpdateAppBean;
 import com.vector.update_app.UpdateAppManager;
+import com.vector.update_app.UpdateDialogFragment;
 import com.vector.update_app.service.DownloadService;
+import com.vector.update_app.utils.AppUpdateUtils;
 
 import java.io.File;
+import java.util.HashMap;
 
 import rx.Observer;
 
@@ -52,9 +73,7 @@ public class AgentWebActivity extends Activity implements View.OnClickListener {
         url = getIntent().getStringExtra(URL);
         updateUrl = getIntent().getStringExtra(UPDATEURL);
         imageUrl = getIntent().getStringExtra(IMAGEURL);
-        imageUrl = getIntent().getStringExtra(IMAGEURL);
-        screenType = getIntent().getIntExtra(SCREEN,3);
-        Log.i("test", "图片" + imageUrl);
+        screenType = getIntent().getIntExtra(SCREEN, 3);
         container = (LinearLayout) findViewById(R.id.container);
         layout_goback = (LinearLayout) findViewById(R.id.layout_goback);
         layout_forwarck = (LinearLayout) findViewById(R.id.layout_forwork);
@@ -66,17 +85,26 @@ public class AgentWebActivity extends Activity implements View.OnClickListener {
                 .setAgentWebParent(container, new LinearLayout.LayoutParams(-1, -1))
                 .useDefaultIndicator()
                 .setMainFrameErrorView(R.layout.agentweb_error_page, -1)
+                .setAgentWebWebSettings(getSettings())//设置 IAgentWebSettings。
+                .setWebViewClient(mWebViewClient)
+                .setPermissionInterceptor(mPermissionInterceptor)
                 .setSecurityType(AgentWeb.SecurityType.STRICT_CHECK)
-                .setWebChromeClient(webClient)
                 .setOpenOtherPageWays(DefaultWebClient.OpenOtherPageWays.ASK)//打开其他应用时，弹窗咨询用户是否前往其他应用
                 .interceptUnkownUrl() //拦截找不到相关页面的Scheme
                 .createAgentWeb()
                 .ready()
                 .go(url);
-
         this.getRxPermissions();
     }
 
+
+    protected PermissionInterceptor mPermissionInterceptor = new PermissionInterceptor() {
+
+        @Override
+        public boolean intercept(String url, String[] permissions, String action) {
+            return false;
+        }
+    };
 
     /**
      * 获取权限
@@ -177,28 +205,21 @@ public class AgentWebActivity extends Activity implements View.OnClickListener {
         }
     }
 
-    WebChromeClient webClient = new WebChromeClient() {
-
-        public void onCloseWindow(Window w) {
-
-        }
-    };
 
     @Override
     protected void onPause() {
         super.onPause();
         mAgentWeb.getWebLifeCycle().onPause();
-
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if(screenType==1){
+        if (screenType == 1) {
             if (getRequestedOrientation() != ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             }
-        }else if(screenType ==2){
+        } else if (screenType == 2) {
             if (getRequestedOrientation() != ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             }
@@ -206,11 +227,75 @@ public class AgentWebActivity extends Activity implements View.OnClickListener {
         mAgentWeb.getWebLifeCycle().onResume();
     }
 
+    private Activity getActivity() {
+        return this;
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         mAgentWeb.getWebLifeCycle().onDestroy();
     }
+
+    private WebViewClient mWebViewClient = new WebViewClient() {
+
+
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            if (url.startsWith("intent://") && url.contains("com.youku.phone")) {
+                return true;
+            }
+            return false;
+        }
+    };
+
+    public IAgentWebSettings getSettings() {
+        return new AbsAgentWebSettings() {
+            private AgentWeb mAgentWeb;
+
+            @Override
+            protected void bindAgentWebSupport(AgentWeb agentWeb) {
+                this.mAgentWeb = agentWeb;
+            }
+
+            @Override
+            public WebListenerManager setDownloader(WebView webView, android.webkit.DownloadListener downloadListener) {
+                return super.setDownloader(webView, DefaultDownloadImpl.create(getActivity(), webView, mSimpleDownloadListener, mAgentWeb.getPermissionInterceptor()));
+            }
+        };
+    }
+
+
+    protected DownloadListener mSimpleDownloadListener = new DownloadListener() {
+        @Override
+        public boolean onStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength, com.just.agentweb.download.Extra extra) {
+            extra.setBreakPointDownload(true) // 是否开启断点续传
+                    .setConnectTimeOut(6000) // 连接最大时长
+                    .setBlockMaxTime(10 * 60 * 1000)  // 以8KB位单位，默认60s ，如果60s内无法从网络流中读满8KB数据，则抛出异常
+                    .setDownloadTimeOut(Long.MAX_VALUE) // 下载最大时长
+                    .setParallelDownload(true)  // 串行下载更节省资源哦
+                    .setEnableIndicator(true)  // false 关闭进度通知
+                    .setAutoOpen(true) // 下载完成自动打开
+                    .setForceDownload(true); // 强制下载，不管网络网络类型
+            return false;
+        }
+
+        @Override
+        public void onProgress(String url, long loaded, long length, long usedTime) {
+            super.onProgress(url, loaded, length, usedTime);
+        }
+
+        @Override
+        public boolean onResult(Throwable throwable, Uri path, String url, com.just.agentweb.download.Extra extra) {
+            if (null == throwable) { //下载成功
+                //do you work
+            } else {//下载失败
+
+            }
+            return false;
+        }
+    };
+
 
     private long mExitTime;
 
