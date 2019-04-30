@@ -3,6 +3,7 @@ package com.sj.mymodule;
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
+import android.content.pm.ApplicationInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
@@ -11,6 +12,7 @@ import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -18,6 +20,7 @@ import android.view.Window;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -69,6 +72,10 @@ public class AgentWebActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//            WebView.setWebContentsDebuggingEnabled(true);
+//        }
+
         setContentView(R.layout.activity_agent_web);
         url = getIntent().getStringExtra(URL);
         updateUrl = getIntent().getStringExtra(UPDATEURL);
@@ -95,6 +102,7 @@ public class AgentWebActivity extends Activity implements View.OnClickListener {
                 .ready()
                 .go(url);
         this.getRxPermissions();
+
     }
 
 
@@ -261,6 +269,14 @@ public class AgentWebActivity extends Activity implements View.OnClickListener {
             @Override
             public WebListenerManager setDownloader(WebView webView, android.webkit.DownloadListener downloadListener) {
                 return super.setDownloader(webView, DefaultDownloadImpl.create(getActivity(), webView, mSimpleDownloadListener, mAgentWeb.getPermissionInterceptor()));
+            }
+
+            @Override
+            public IAgentWebSettings toSetting(WebView webView) {
+                IAgentWebSettings agentWebSettings = super.toSetting(webView);
+                WebSettings webSettings = agentWebSettings.getWebSettings();
+                webSettings.setUseWideViewPort(true);
+                return agentWebSettings;
             }
         };
     }
