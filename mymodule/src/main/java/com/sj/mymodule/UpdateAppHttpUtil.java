@@ -94,6 +94,7 @@ public class UpdateAppHttpUtil implements HttpManager {
 
                     @Override
                     public void onError(Call call, Response response, Exception e, int id) {
+
                         callback.onError(validateError(e, response));
                     }
 

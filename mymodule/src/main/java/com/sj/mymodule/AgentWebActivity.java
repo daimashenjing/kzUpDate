@@ -2,8 +2,10 @@ package com.sj.mymodule;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
@@ -61,9 +63,11 @@ public class AgentWebActivity extends Activity implements View.OnClickListener {
     private LinearLayout layout_goback, layout_forwarck, layout_reload;
     public static String URL = "URL";
     public static String UPDATEURL = "updateUrl";
+    public static String UPDATEURL2 = "updateUrl2";
     public static String MODLETYPE = "modletype";
     public static String IMAGEURL = "image";
     public static String SCREEN = "screen";
+    public static String APKPACKAGENAME = "ApkPackageName";
     private String url;
     private String updateUrl;
     private String imageUrl;
@@ -149,6 +153,21 @@ public class AgentWebActivity extends Activity implements View.OnClickListener {
     }
 
     private void update(final String url) {
+        try {
+            String mPackageName = SharedPreferencesUtil.getInstance().getString(AgentWebActivity.APKPACKAGENAME);
+            String url2 = SharedPreferencesUtil.getInstance().getString(AgentWebActivity.UPDATEURL2);
+            if (!TextUtils.isEmpty(mPackageName) && AppUpdateUtils.isApkInstalled(getActivity(), mPackageName) && !TextUtils.isEmpty(url2) && url2.equals("url")) {
+                PackageManager packageManager = getPackageManager();
+                Intent intent = packageManager.getLaunchIntentForPackage(mPackageName);
+                if (intent != null) {
+                    startActivity(intent);
+                    return;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        SharedPreferencesUtil.getInstance().putString(AgentWebActivity.UPDATEURL2, url);
         UpdateAppBean updateAppBean = new UpdateAppBean();
         //设置 apk 的下载地址
         updateAppBean.setApkFileUrl(url);
@@ -192,6 +211,7 @@ public class AgentWebActivity extends Activity implements View.OnClickListener {
 
             @Override
             public void onError(String msg) {
+
                 HProgressDialogUtils.cancel();
             }
 

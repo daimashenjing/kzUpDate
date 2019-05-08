@@ -29,7 +29,6 @@ import java.io.File;
 public class DownloadService extends Service {
 
     private static final int NOTIFY_ID = 0;
-    private static final String TAG = DownloadService.class.getSimpleName();
     private static final String CHANNEL_ID = "app_update_id";
     private static final CharSequence CHANNEL_NAME = "app_update_channel";
 
@@ -37,15 +36,7 @@ public class DownloadService extends Service {
     private NotificationManager mNotificationManager;
     private DownloadBinder binder = new DownloadBinder();
     private NotificationCompat.Builder mBuilder;
-    //    /**
-//     * 开启服务方法
-//     *
-//     * @param context
-//     */
-//    public static void startService(Context context) {
-//        Intent intent = new Intent(context, DownloadService.class);
-//        context.startService(intent);
-//    }
+
     private boolean mDismissNotificationProgress = false;
 
     public static void bindService(Context context, ServiceConnection connection) {
@@ -87,39 +78,12 @@ public class DownloadService extends Service {
             return;
         }
 
-
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
-            //设置绕过免打扰模式
-//            channel.setBypassDnd(false);
-//            //检测是否绕过免打扰模式
-//            channel.canBypassDnd();
-//            //设置在锁屏界面上显示这条通知
-//            channel.setLockscreenVisibility(Notification.VISIBILITY_SECRET);
-//            channel.setLightColor(Color.GREEN);
-//            channel.setShowBadge(true);
-//            channel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
             channel.enableVibration(false);
             channel.enableLights(false);
-
             mNotificationManager.createNotificationChannel(channel);
-
-
         }
-
-//        try {
-//            mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID);
-//            mBuilder.setContentTitle("开始下载")
-//                    .setContentText("正在连接服务器")
-//                    .setSmallIcon(R.mipmap.lib_update_app_update_icon)
-//                    .setLargeIcon(AppUpdateUtils.drawableToBitmap(AppUpdateUtils.getAppIcon(DownloadService.this)))
-//                    .setOngoing(true)
-//                    .setAutoCancel(true)
-//                    .setWhen(System.currentTimeMillis());
-//            mNotificationManager.notify(NOTIFY_ID, mBuilder.build());
-//        } catch (Exception e) {
-//        }
-
 
     }
 

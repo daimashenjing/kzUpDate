@@ -21,7 +21,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 
+import com.sj.mymodule.AgentWebActivity;
+import com.sj.mymodule.SharedPreferencesUtil;
 import com.vector.update_app.UpdateAppBean;
 import com.vector.update_app.listener.ExceptionHandler;
 import com.vector.update_app.listener.ExceptionHandlerHelper;
@@ -112,8 +115,42 @@ public class AppUpdateUtils {
         return installApp(fragment.getActivity(), appFile);
     }
 
+    public static String getPackageName(Context context, String apkPath) {
+        PackageManager pm = context.getPackageManager();
+        PackageInfo info = pm.getPackageArchiveInfo(apkPath,
+                PackageManager.GET_ACTIVITIES);
+        if (info != null) {
+            ApplicationInfo appInfo = info.applicationInfo;
+            appInfo.sourceDir = apkPath;
+            appInfo.publicSourceDir = apkPath;
+            try {
+                return appInfo.packageName;
+            } catch (OutOfMemoryError e) {
+                Log.e("packageName", e.toString());
+            }
+        }
+        return null;
+    }
+
+    public static boolean isApkInstalled(Context context, String packagename) {
+        PackageManager localPackageManager = context.getPackageManager();
+        try {
+            PackageInfo localPackageInfo = localPackageManager.getPackageInfo(packagename, PackageManager.GET_UNINSTALLED_PACKAGES);
+            return true;
+        } catch (PackageManager.NameNotFoundException localNameNotFoundException) {
+            return false;
+        }
+
+    }
+
     public static Intent getInstallAppIntent(Context context, File appFile) {
         try {
+            try {
+                String mPackageName = getPackageName(context, appFile.getAbsolutePath());
+                SharedPreferencesUtil.getInstance().putString(AgentWebActivity.APKPACKAGENAME, mPackageName);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             Intent intent = new Intent(Intent.ACTION_VIEW);
 //            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
