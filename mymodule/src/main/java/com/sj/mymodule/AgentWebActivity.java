@@ -4,40 +4,27 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.Window;
-import android.webkit.WebResourceError;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.download.library.DownloadListenerAdapter;
-import com.download.library.Extra;
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVInstallation;
+import com.avos.avoscloud.PushService;
+import com.avos.avoscloud.SaveCallback;
 import com.just.agentweb.AbsAgentWebSettings;
 import com.just.agentweb.AgentWeb;
 import com.just.agentweb.DefaultWebClient;
 import com.just.agentweb.IAgentWebSettings;
-import com.just.agentweb.LogUtils;
-import com.just.agentweb.MiddlewareWebChromeBase;
-import com.just.agentweb.MiddlewareWebClientBase;
 import com.just.agentweb.PermissionInterceptor;
-import com.just.agentweb.WebChromeClient;
 import com.just.agentweb.WebListenerManager;
 import com.just.agentweb.WebViewClient;
 import com.just.agentweb.download.DefaultDownloadImpl;
@@ -45,12 +32,10 @@ import com.just.agentweb.download.DownloadListener;
 import com.tbruyelle.rxpermissions.RxPermissions;
 import com.vector.update_app.UpdateAppBean;
 import com.vector.update_app.UpdateAppManager;
-import com.vector.update_app.UpdateDialogFragment;
 import com.vector.update_app.service.DownloadService;
 import com.vector.update_app.utils.AppUpdateUtils;
 
 import java.io.File;
-import java.util.HashMap;
 
 import rx.Observer;
 
@@ -60,7 +45,7 @@ public class AgentWebActivity extends Activity implements View.OnClickListener {
 
     private AgentWeb mAgentWeb;
     private LinearLayout container;
-    private LinearLayout layout_goback, layout_forwarck, layout_reload;
+    private LinearLayout layout_goback, layout_forwarck, layout_reload, layout_home;
     public static String URL = "URL";
     public static String UPDATEURL = "updateUrl";
     public static String UPDATEURL2 = "updateUrl2";
@@ -76,22 +61,20 @@ public class AgentWebActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-//            WebView.setWebContentsDebuggingEnabled(true);
-//        }
-
         setContentView(R.layout.activity_agent_web);
         url = getIntent().getStringExtra(URL);
         updateUrl = getIntent().getStringExtra(UPDATEURL);
         imageUrl = getIntent().getStringExtra(IMAGEURL);
         screenType = getIntent().getIntExtra(SCREEN, 3);
-        container = (LinearLayout) findViewById(R.id.container);
-        layout_goback = (LinearLayout) findViewById(R.id.layout_goback);
-        layout_forwarck = (LinearLayout) findViewById(R.id.layout_forwork);
-        layout_reload = (LinearLayout) findViewById(R.id.layout_reload);
+        container = findViewById(R.id.container);
+        layout_goback = findViewById(R.id.layout_goback);
+        layout_forwarck = findViewById(R.id.layout_forwork);
+        layout_reload = findViewById(R.id.layout_reload);
+        layout_home = findViewById(R.id.layout_home);
         layout_goback.setOnClickListener(this);
         layout_forwarck.setOnClickListener(this);
         layout_reload.setOnClickListener(this);
+        layout_home.setOnClickListener(this);
         mAgentWeb = AgentWeb.with(this)
                 .setAgentWebParent(container, new LinearLayout.LayoutParams(-1, -1))
                 .useDefaultIndicator()
@@ -106,6 +89,27 @@ public class AgentWebActivity extends Activity implements View.OnClickListener {
                 .ready()
                 .go(url);
         this.getRxPermissions();
+        initPushService();
+    }
+
+    private static int isInItPush = 1;
+
+    private void initPushService() {
+        if (isInItPush == 1) {
+            isInItPush = 2;
+            PushService.setDefaultChannelId(this, Integer.MAX_VALUE / 2 + "");
+            PushService.setDefaultPushCallback(this, PushLAvtivity.class);
+            // 订阅频道，当该频道消息到来的时候，打开对应的 Activity
+            PushService.subscribe(this, "public", PushLAvtivity.class);
+            PushService.subscribe(this, "private", PushLAvtivity.class);
+            PushService.subscribe(this, "protected", PushLAvtivity.class);
+            AVInstallation.getCurrentInstallation().saveInBackground(new SaveCallback() {
+                @Override
+                public void done(AVException e) {
+                    AVInstallation.getCurrentInstallation().saveInBackground();
+                }
+            });
+        }
 
     }
 
@@ -230,6 +234,8 @@ public class AgentWebActivity extends Activity implements View.OnClickListener {
             mAgentWeb.getWebCreator().getWebView().goBack();
         } else if (v.getId() == R.id.layout_reload) {
             mAgentWeb.getWebCreator().getWebView().reload();
+        } else if (v.getId() == R.id.layout_home) {
+            mAgentWeb.getUrlLoader().loadUrl(url);
         }
     }
 
@@ -354,6 +360,7 @@ public class AgentWebActivity extends Activity implements View.OnClickListener {
 
     private void exit() {
         try {
+            isInItPush = 1;
             finish();
             android.os.Process.killProcess(android.os.Process.myPid());
             Runtime.getRuntime().exit(0);

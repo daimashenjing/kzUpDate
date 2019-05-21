@@ -16,7 +16,6 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:gravity="center_vertical">
-
         <LinearLayout
             android:id="@+id/layout_goback"
             android:layout_width="0dp"
@@ -78,7 +77,25 @@
                 android:text="刷新" />
 
         </LinearLayout>
+        <LinearLayout
+            android:id="@+id/layout_home"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
 
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@mipmap/ic_web_home" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="主页" />
+
+        </LinearLayout>
 
     </LinearLayout>
 </LinearLayout>

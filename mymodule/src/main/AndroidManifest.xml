@@ -6,9 +6,9 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
-    <application
-        android:usesCleartextTraffic="true">
+    <application android:usesCleartextTraffic="true">
         <service android:name="com.vector.update_app.service.DownloadService" />
         <provider
             android:name="com.vector.update_app.UpdateFileProvider"
@@ -19,7 +19,18 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/new_app_file_paths" />
         </provider>
-        <activity android:name="com.sj.mymodule.AgentWebActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize|orientation|screenLayout"/>
+        <activity
+            android:name="com.sj.mymodule.AgentWebActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|orientation|screenLayout"
+            android:theme="@style/Theme.AppCompat.Light" />
+        <activity
+            android:name="com.sj.mymodule.PushLAvtivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|orientation|screenLayout"
+            android:theme="@style/Theme.AppCompat.Light" />
+        <service
+            android:name="com.avos.avoscloud.PushService"
+            android:exported="true" />
+
+
     </application>
 </manifest>

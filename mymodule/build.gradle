@@ -62,18 +62,21 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    compile 'com.just.agentweb:agentweb:4.0.3-alpha@aar'
-    compile 'com.just.agentweb:filechooser:4.0.3-alpha@aar'
-    compile 'com.just.agentweb:download:4.0.3-alpha@aar'
-    compile 'com.github.Justson:Downloader:v4.0.3'
-    compile 'com.lzy.net:okgo:3.0.4'
-    compile 'com.qianwen:okhttp-utils:3.8.0'
-    compile 'com.tbruyelle.rxpermissions:rxpermissions:0.9.4@aar'
-    compile 'io.reactivex:rxandroid:1.2.1'
-    compile 'com.squareup.okhttp3:okhttp:3.8.1'
-    compile 'com.alibaba:fastjson:1.2.37'
-    testCompile 'org.robolectric:robolectric:3.1.4'
-    testCompile 'org.mockito:mockito-core:1.10.19'
+    implementation 'com.just.agentweb:agentweb:4.0.3-alpha@aar'
+    implementation 'com.just.agentweb:filechooser:4.0.3-alpha@aar'
+    implementation 'com.just.agentweb:download:4.0.3-alpha@aar'
+    implementation 'com.github.Justson:Downloader:v4.0.3'
+    implementation 'com.lzy.net:okgo:3.0.4'
+    implementation 'com.qianwen:okhttp-utils:3.8.0'
+    implementation 'com.tbruyelle.rxpermissions:rxpermissions:0.9.4@aar'
+    implementation 'io.reactivex:rxandroid:1.2.1'
+    implementation 'com.alibaba:fastjson:1.2.37'
+    // LeanCloud 基础包
+    api ('cn.leancloud.android:avoscloud-sdk:4.7.10')
+    // 推送与即时通讯需要的包
+    api ('cn.leancloud.android:avoscloud-push:4.7.10@aar'){transitive = true}
+    testImplementation 'org.robolectric:robolectric:3.1.4'
+    testImplementation 'org.mockito:mockito-core:1.10.19'
     implementation files('libs/universal-image-loader-1.9.5.jar')
 }
 
