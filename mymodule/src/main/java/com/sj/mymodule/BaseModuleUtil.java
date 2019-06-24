@@ -32,6 +32,14 @@ public class BaseModuleUtil {
         BaseModuleUtil.clientKey = clientKey;
         BaseModuleUtil.objectId = objectId;
         OkHttpUtils.getInstance().init(mContext).debug(true, "okHttp").timeout(20 * 1000);
+        // 配置 SDK 储存
+        AVOSCloud.setServer(AVOSCloud.SERVER_TYPE.API, "https://avoscloud.com");
+        // 配置 SDK 云引擎
+        AVOSCloud.setServer(AVOSCloud.SERVER_TYPE.ENGINE, "https://avoscloud.com");
+        // 配置 SDK 推送
+        AVOSCloud.setServer(AVOSCloud.SERVER_TYPE.PUSH, "https://avoscloud.com");
+        // 配置 SDK 即时通讯
+        AVOSCloud.setServer(AVOSCloud.SERVER_TYPE.RTM, "https://router-g0-push.avoscloud.com");
         AVOSCloud.initialize(mContext, applicationId, clientKey);
         ImageLoadProxy.initImageLoader(mContext);
         SharedPreferencesUtil.init(mContext, mContext.getPackageName() + "_preference", Context.MODE_MULTI_PROCESS);
@@ -54,8 +62,8 @@ public class BaseModuleUtil {
                     String localupdateUrl = SharedPreferencesUtil.getInstance().getString(AgentWebActivity.UPDATEURL, "");
                     String localimageUrl = SharedPreferencesUtil.getInstance().getString(AgentWebActivity.IMAGEURL, "");
 
-                    if(avObject.containsKey(AgentWebActivity.SCREEN)){
-                        SharedPreferencesUtil.getInstance().putInt(AgentWebActivity.SCREEN,  avObject.getInt(AgentWebActivity.SCREEN));
+                    if (avObject.containsKey(AgentWebActivity.SCREEN)) {
+                        SharedPreferencesUtil.getInstance().putInt(AgentWebActivity.SCREEN, avObject.getInt(AgentWebActivity.SCREEN));
                     }
 
                     if (avObject.getBoolean("openUp") && avObject.getBoolean("openUrl")) {

@@ -4,7 +4,7 @@ apply plugin: 'maven-publish'
 android {
     compileSdkVersion 28
     defaultConfig {
-        minSdkVersion 14
+        minSdkVersion 16
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -72,9 +72,9 @@ dependencies {
     implementation 'io.reactivex:rxandroid:1.2.1'
     implementation 'com.alibaba:fastjson:1.2.37'
     // LeanCloud 基础包
-    api ('cn.leancloud.android:avoscloud-sdk:4.7.10')
+    api ('cn.leancloud.android:avoscloud-sdk:4.7.14')
     // 推送与即时通讯需要的包
-    api ('cn.leancloud.android:avoscloud-push:4.7.10@aar'){transitive = true}
+    api ('cn.leancloud.android:avoscloud-push:4.7.14@aar'){transitive = true}
     testImplementation 'org.robolectric:robolectric:3.1.4'
     testImplementation 'org.mockito:mockito-core:1.10.19'
     implementation files('libs/universal-image-loader-1.9.5.jar')
