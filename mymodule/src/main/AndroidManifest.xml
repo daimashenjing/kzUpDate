@@ -38,9 +38,7 @@
         <activity
             android:name="com.sj.mymodule.AgentWebActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|orientation|screenLayout"
-            android:label="WebView"
             android:launchMode="singleInstance"
-            android:process=":webview"
             android:theme="@style/Theme.AppCompat.Light" />
 
         <activity

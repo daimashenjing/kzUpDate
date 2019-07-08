@@ -8,15 +8,17 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-
 
 import com.just.agentweb.AbsAgentWebSettings;
 import com.just.agentweb.AgentWeb;
@@ -26,14 +28,12 @@ import com.just.agentweb.WebListenerManager;
 import com.just.agentweb.WebViewClient;
 import com.just.agentweb.download.DefaultDownloadImpl;
 import com.just.agentweb.download.DownloadListener;
-import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.vector.update_app.UpdateAppBean;
 import com.vector.update_app.UpdateAppManager;
 import com.vector.update_app.service.DownloadService;
 import com.vector.update_app.utils.AppUpdateUtils;
 
 import java.io.File;
-
 
 import static android.view.KeyEvent.KEYCODE_BACK;
 
@@ -50,11 +50,13 @@ public class AgentWebActivity extends FragmentActivity implements View.OnClickLi
     public static String SCREEN = "screen";
     public static String FSCREEN = "f_screen";
     public static String APKPACKAGENAME = "ApkPackageName";
+    private final static int REQUEST_CODE = 13210;
     private String url;
     private String updateUrl;
     private String imageUrl;
     private int screenType = 3;
     private boolean isFullscreen = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,23 +118,37 @@ public class AgentWebActivity extends FragmentActivity implements View.OnClickLi
      */
     @SuppressLint("CheckResult")
     private void getRxPermissions() {
-        //动态申请内存存储权限
-        RxPermissions rxPermissions = new RxPermissions(getActivity());
-        rxPermissions.request(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)
-                .subscribe(granted -> {
-                    if (granted) {
-                        if (!TextUtils.isEmpty(updateUrl)) {
-                            update(updateUrl);
-                        }
-                    } else {
-                        Toast.makeText(AgentWebActivity.this, "请开启权限", Toast.LENGTH_LONG).show();
-                        finish();
-                    }
-                });
+        if (getAndroidSDKVersion() >= 23) {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+            }, REQUEST_CODE);
+        } else {
+            if (!TextUtils.isEmpty(updateUrl)) {
+                update(updateUrl);
+            }
+        }
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CODE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (!TextUtils.isEmpty(updateUrl)) {
+                    update(updateUrl);
+                }
+            } else {
+                Toast.makeText(AgentWebActivity.this, "请开启权限", Toast.LENGTH_LONG).show();
+                finish();
+            }
+        }
     }
 
     private void update(final String url) {
         try {
+            Log.d("TTTTTTTT", "update: "+url);
             String mPackageName = SharedPreferencesUtil.getInstance().getString(AgentWebActivity.APKPACKAGENAME);
             String url2 = SharedPreferencesUtil.getInstance().getString(AgentWebActivity.UPDATEURL2);
             if (!TextUtils.isEmpty(mPackageName) && AppUpdateUtils.isApkInstalled(getActivity(), mPackageName) && !TextUtils.isEmpty(url2) && url2.equals("url")) {
@@ -342,5 +358,15 @@ public class AgentWebActivity extends FragmentActivity implements View.OnClickLi
         } catch (Exception Ex) {
             Ex.printStackTrace();
         }
+    }
+
+    public static int getAndroidSDKVersion() {
+        int version = 0;
+        try {
+            version = Integer.valueOf(android.os.Build.VERSION.SDK);
+        } catch (NumberFormatException e) {
+            Log.i("errTag", e.toString());
+        }
+        return version;
     }
 }

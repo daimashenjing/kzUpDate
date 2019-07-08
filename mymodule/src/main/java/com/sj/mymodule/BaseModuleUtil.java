@@ -32,10 +32,10 @@ public class BaseModuleUtil {
      * @param mContext
      */
     public static void init(Context mContext, String applicationId) {
-        context = new SoftReference<>(mContext);
-        Bmob.initialize(mContext, applicationId);
-        ImageLoadProxy.initImageLoader(mContext);
-        SharedPreferencesUtil.init(mContext, mContext.getPackageName() + "_preference", Context.MODE_MULTI_PROCESS);
+        context = new SoftReference<>(mContext.getApplicationContext());
+        Bmob.initialize(mContext.getApplicationContext(), applicationId);
+        ImageLoadProxy.initImageLoader(mContext.getApplicationContext());
+        SharedPreferencesUtil.init(mContext.getApplicationContext(), mContext.getPackageName() + "_preference", Context.MODE_MULTI_PROCESS);
        try {
            BmobInstallationManager.getInstance().initialize(new InstallationListener<BmobInstallation>() {
                @Override
@@ -47,7 +47,7 @@ public class BaseModuleUtil {
                    }
                }
            });
-           BmobPush.startWork(mContext);
+           BmobPush.startWork(mContext.getApplicationContext());
        }catch (Exception e){
            e.printStackTrace();
        }
