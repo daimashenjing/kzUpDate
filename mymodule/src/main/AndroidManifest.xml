@@ -1,15 +1,30 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.sj.mymodule">
-
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.sj.mymodule"
+    android:sharedUserId="android.uid.system">
+    <!--允许联网 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!--获取GSM（2g）、WCDMA（联通3g）等网络状态的信息  -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
+    <!--获取wifi网络状态的信息 -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <!--保持CPU 运转，屏幕和键盘灯有可能是关闭的,用于文件上传和下载 -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!--获取sd卡写的权限，用于文件上传和下载-->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-    <uses-permission android:name="android.permission.INTERNET" />
+    <!--允许读取手机状态 用于创建BmobInstallation-->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <!--推送所需的权限-->
+    <uses-permission android:name="android.permission.RECEIVE_USER_PRESENT" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
-    <application android:usesCleartextTraffic="true">
+    <application
+        android:usesCleartextTraffic="true"
+        tools:ignore="UnusedAttribute">
+
         <service android:name="com.vector.update_app.service.DownloadService" />
+
         <provider
             android:name="com.vector.update_app.UpdateFileProvider"
             android:authorities="${applicationId}.fileProvider"
@@ -19,18 +34,49 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/new_app_file_paths" />
         </provider>
+
         <activity
             android:name="com.sj.mymodule.AgentWebActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|orientation|screenLayout"
+            android:label="WebView"
+            android:launchMode="singleInstance"
+            android:process=":webview"
             android:theme="@style/Theme.AppCompat.Light" />
+
         <activity
             android:name="com.sj.mymodule.PushLAvtivity"
             android:configChanges="keyboardHidden|orientation|screenSize|orientation|screenLayout"
             android:theme="@style/Theme.AppCompat.Light" />
+
+        <provider
+            android:name="cn.bmob.v3.util.BmobContentProvider"
+            android:authorities="${applicationId}.BmobContentProvider"
+            android:exported="true"
+            tools:ignore="ExportedContentProvider" />
+
         <service
-            android:name="com.avos.avoscloud.PushService"
-            android:exported="true" />
+            android:name="cn.bmob.push.lib.service.PushService"
+            android:exported="true"
+            android:label="PushService"
+            android:process=":bmobpush">
+            <intent-filter>
+                <action android:name="cn.bmob.push.lib.service.PushService" />
+            </intent-filter>
+        </service>
 
+        <receiver
+            android:name="cn.bmob.push.PushNotifyReceiver"
+            android:process=":bmobpush">
+            <intent-filter>
+                <action android:name="cn.bmob.push.action.HEARTBEAT" />
+                <action android:name="cn.bmob.push.action.NOTIFY" />
+            </intent-filter>
+        </receiver>
 
+        <receiver android:name=".PushMessageReceiver">
+            <intent-filter>
+                <action android:name="cn.bmob.push.action.MESSAGE" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

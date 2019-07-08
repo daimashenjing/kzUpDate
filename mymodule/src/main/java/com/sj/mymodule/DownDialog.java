@@ -2,9 +2,7 @@ package com.sj.mymodule;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
@@ -19,7 +17,7 @@ public class DownDialog extends Dialog {
     private TextView tv_current;
     private ProgressBar progressBar;
 
-    public DownDialog(@NonNull Context context) {
+    public DownDialog(Context context) {
         super(context);
     }
 

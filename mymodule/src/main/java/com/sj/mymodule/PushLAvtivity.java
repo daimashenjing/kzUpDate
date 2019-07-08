@@ -8,11 +8,6 @@ public class PushLAvtivity extends Activity {
     protected void onCreate( Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_l_push);
-        BaseModuleUtil.startActivity(this, new BaseModuleUtil.ImpStartLister() {
-            @Override
-            public void start() {
-
-            }
-        });
+        BaseModuleUtil.startActivity(this, null);
     }
 }

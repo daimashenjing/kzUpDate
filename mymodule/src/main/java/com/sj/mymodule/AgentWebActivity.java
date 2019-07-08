@@ -1,13 +1,14 @@
 package com.sj.mymodule;
 
 import android.Manifest;
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
@@ -16,20 +17,16 @@ import android.webkit.WebView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.avos.avoscloud.AVException;
-import com.avos.avoscloud.AVInstallation;
-import com.avos.avoscloud.PushService;
-import com.avos.avoscloud.SaveCallback;
+
 import com.just.agentweb.AbsAgentWebSettings;
 import com.just.agentweb.AgentWeb;
 import com.just.agentweb.DefaultWebClient;
 import com.just.agentweb.IAgentWebSettings;
-import com.just.agentweb.PermissionInterceptor;
 import com.just.agentweb.WebListenerManager;
 import com.just.agentweb.WebViewClient;
 import com.just.agentweb.download.DefaultDownloadImpl;
 import com.just.agentweb.download.DownloadListener;
-import com.tbruyelle.rxpermissions.RxPermissions;
+import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.vector.update_app.UpdateAppBean;
 import com.vector.update_app.UpdateAppManager;
 import com.vector.update_app.service.DownloadService;
@@ -37,11 +34,10 @@ import com.vector.update_app.utils.AppUpdateUtils;
 
 import java.io.File;
 
-import rx.Observer;
 
 import static android.view.KeyEvent.KEYCODE_BACK;
 
-public class AgentWebActivity extends Activity implements View.OnClickListener {
+public class AgentWebActivity extends FragmentActivity implements View.OnClickListener {
 
     private AgentWeb mAgentWeb;
     private LinearLayout container;
@@ -52,20 +48,29 @@ public class AgentWebActivity extends Activity implements View.OnClickListener {
     public static String MODLETYPE = "modletype";
     public static String IMAGEURL = "image";
     public static String SCREEN = "screen";
+    public static String FSCREEN = "f_screen";
     public static String APKPACKAGENAME = "ApkPackageName";
     private String url;
     private String updateUrl;
     private String imageUrl;
     private int screenType = 3;
+    private boolean isFullscreen = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_agent_web);
-        url = getIntent().getStringExtra(URL);
-        updateUrl = getIntent().getStringExtra(UPDATEURL);
-        imageUrl = getIntent().getStringExtra(IMAGEURL);
-        screenType = getIntent().getIntExtra(SCREEN, 3);
+        Intent mIntent = getIntent();
+        if (mIntent != null) {
+            url = mIntent.getStringExtra(URL);
+            updateUrl = mIntent.getStringExtra(UPDATEURL);
+            imageUrl = mIntent.getStringExtra(IMAGEURL);
+            screenType = mIntent.getIntExtra(SCREEN, 3);
+            isFullscreen = mIntent.getBooleanExtra(FSCREEN, false);
+        } else {
+            finish();
+            return;
+        }
         container = findViewById(R.id.container);
         layout_goback = findViewById(R.id.layout_goback);
         layout_forwarck = findViewById(R.id.layout_forwork);
@@ -81,7 +86,6 @@ public class AgentWebActivity extends Activity implements View.OnClickListener {
                 .setMainFrameErrorView(R.layout.agentweb_error_page, -1)
                 .setAgentWebWebSettings(getSettings())//设置 IAgentWebSettings。
                 .setWebViewClient(mWebViewClient)
-                .setPermissionInterceptor(mPermissionInterceptor)
                 .setSecurityType(AgentWeb.SecurityType.STRICT_CHECK)
                 .setOpenOtherPageWays(DefaultWebClient.OpenOtherPageWays.ASK)//打开其他应用时，弹窗咨询用户是否前往其他应用
                 .interceptUnkownUrl() //拦截找不到相关页面的Scheme
@@ -90,6 +94,11 @@ public class AgentWebActivity extends Activity implements View.OnClickListener {
                 .go(url);
         this.getRxPermissions();
         initPushService();
+        if (isFullscreen) {
+            findViewById(R.id.tabBar).setVisibility(View.GONE);
+        } else {
+            findViewById(R.id.tabBar).setVisibility(View.VISIBLE);
+        }
     }
 
     private static int isInItPush = 1;
@@ -97,61 +106,27 @@ public class AgentWebActivity extends Activity implements View.OnClickListener {
     private void initPushService() {
         if (isInItPush == 1) {
             isInItPush = 2;
-            PushService.setDefaultChannelId(this, Integer.MAX_VALUE / 2 + "");
-            PushService.setDefaultPushCallback(this, PushLAvtivity.class);
-            // 订阅频道，当该频道消息到来的时候，打开对应的 Activity
-            PushService.subscribe(this, "public", PushLAvtivity.class);
-            PushService.subscribe(this, "private", PushLAvtivity.class);
-            PushService.subscribe(this, "protected", PushLAvtivity.class);
-            AVInstallation.getCurrentInstallation().saveInBackground(new SaveCallback() {
-                @Override
-                public void done(AVException e) {
-                    AVInstallation.getCurrentInstallation().saveInBackground();
-                }
-            });
         }
 
     }
 
 
-    protected PermissionInterceptor mPermissionInterceptor = new PermissionInterceptor() {
-
-        @Override
-        public boolean intercept(String url, String[] permissions, String action) {
-            return false;
-        }
-    };
-
     /**
      * 获取权限
      */
+    @SuppressLint("CheckResult")
     private void getRxPermissions() {
         //动态申请内存存储权限
-        RxPermissions rxPermissions = new RxPermissions(this);
-        rxPermissions
-                .request(Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        Manifest.permission.READ_EXTERNAL_STORAGE)
-                .subscribe(new Observer<Boolean>() {
-                    @Override
-                    public void onNext(Boolean aBoolean) {
-                        if (aBoolean) {
-                            if (!TextUtils.isEmpty(updateUrl)) {
-                                update(updateUrl);
-                            }
-                        } else {
-                            Toast.makeText(AgentWebActivity.this, "请开启权限", Toast.LENGTH_LONG).show();
-                            finish();
+        RxPermissions rxPermissions = new RxPermissions(getActivity());
+        rxPermissions.request(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)
+                .subscribe(granted -> {
+                    if (granted) {
+                        if (!TextUtils.isEmpty(updateUrl)) {
+                            update(updateUrl);
                         }
-                    }
-
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
+                    } else {
+                        Toast.makeText(AgentWebActivity.this, "请开启权限", Toast.LENGTH_LONG).show();
+                        finish();
                     }
                 });
     }
@@ -261,7 +236,7 @@ public class AgentWebActivity extends Activity implements View.OnClickListener {
         mAgentWeb.getWebLifeCycle().onResume();
     }
 
-    private Activity getActivity() {
+    private FragmentActivity getActivity() {
         return this;
     }
 

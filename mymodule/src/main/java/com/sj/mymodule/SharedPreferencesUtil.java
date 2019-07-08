@@ -15,6 +15,7 @@
  */
 package com.sj.mymodule;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -44,6 +45,7 @@ public class SharedPreferencesUtil {
         return prefsUtil;
     }
 
+    @SuppressLint("CommitPrefEdits")
     public static void init(Context context, String prefsname, int mode) {
         prefsUtil = new SharedPreferencesUtil();
         prefsUtil.context = context;
