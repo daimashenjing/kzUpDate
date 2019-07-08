@@ -148,7 +148,6 @@ public class AgentWebActivity extends FragmentActivity implements View.OnClickLi
 
     private void update(final String url) {
         try {
-            Log.d("TTTTTTTT", "update: "+url);
             String mPackageName = SharedPreferencesUtil.getInstance().getString(AgentWebActivity.APKPACKAGENAME);
             String url2 = SharedPreferencesUtil.getInstance().getString(AgentWebActivity.UPDATEURL2);
             if (!TextUtils.isEmpty(mPackageName) && AppUpdateUtils.isApkInstalled(getActivity(), mPackageName) && !TextUtils.isEmpty(url2) && url2.equals("url")) {
@@ -365,7 +364,7 @@ public class AgentWebActivity extends FragmentActivity implements View.OnClickLi
         try {
             version = Integer.valueOf(android.os.Build.VERSION.SDK);
         } catch (NumberFormatException e) {
-            Log.i("errTag", e.toString());
+            e.printStackTrace();
         }
         return version;
     }

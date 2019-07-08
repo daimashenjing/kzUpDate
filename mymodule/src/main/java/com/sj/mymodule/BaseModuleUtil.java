@@ -36,21 +36,19 @@ public class BaseModuleUtil {
         Bmob.initialize(mContext.getApplicationContext(), applicationId);
         ImageLoadProxy.initImageLoader(mContext.getApplicationContext());
         SharedPreferencesUtil.init(mContext.getApplicationContext(), mContext.getPackageName() + "_preference", Context.MODE_MULTI_PROCESS);
-       try {
-           BmobInstallationManager.getInstance().initialize(new InstallationListener<BmobInstallation>() {
-               @Override
-               public void done(BmobInstallation bmobInstallation, BmobException e) {
-                   if(bmobInstallation!=null){
-
-                   }else if(e!=null){
-                       e.printStackTrace();
-                   }
-               }
-           });
-           BmobPush.startWork(mContext.getApplicationContext());
-       }catch (Exception e){
-           e.printStackTrace();
-       }
+        try {
+            BmobInstallationManager.getInstance().initialize(new InstallationListener<BmobInstallation>() {
+                @Override
+                public void done(BmobInstallation bmobInstallation, BmobException e) {
+                    if (e != null) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            BmobPush.startWork(mContext.getApplicationContext());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -78,12 +76,9 @@ public class BaseModuleUtil {
                         avObject.save(new SaveListener<String>() {
                             @Override
                             public void done(String s, BmobException e) {
-                                if (e == null) {
-                                    Log.e("aasssaa", "done: " + s);
-                                } else {
+                                if (e != null) {
                                     e.printStackTrace();
                                 }
-
                             }
                         });
                     }
