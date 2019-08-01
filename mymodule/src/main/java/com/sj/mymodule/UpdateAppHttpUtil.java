@@ -14,10 +14,6 @@ import okhttp3.Call;
 import okhttp3.Request;
 import okhttp3.Response;
 
-/**
- * Created by Vector
- * on 2017/6/19 0019.
- */
 
 public class UpdateAppHttpUtil implements HttpManager {
     /**

@@ -41,4 +41,5 @@
         <item name="android:windowEnterAnimation">@anim/update_app_window_in</item>
         <item name="android:windowExitAnimation">@anim/update_app_window_out</item>
     </style>
+    <style name="M_App_Theme" parent="Theme.AppCompat.Light.NoActionBar"/>
 </resources>

@@ -17,21 +17,14 @@ public class HProgressDialogUtils {
         throw new UnsupportedOperationException("cannot be instantiated");
     }
 
-    @SuppressLint("NewApi")
     public static void showHorizontalProgressDialog(Activity context, String msg, boolean isShowSize) {
         cancel();
         if (sHorizontalProgressDialog == null) {
             sHorizontalProgressDialog = new ProgressDialog(context);
             sHorizontalProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
             sHorizontalProgressDialog.setCanceledOnTouchOutside(false);
-            sHorizontalProgressDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
-                public boolean onKey(DialogInterface dialog, int keyCode,
-                                     KeyEvent event) {
-                    if (keyCode == KeyEvent.KEYCODE_BACK) {
-                        return true;
-                    }
-                    return false;
-                }
+            sHorizontalProgressDialog.setOnKeyListener((dialog, keyCode, event) -> {
+                return keyCode == KeyEvent.KEYCODE_BACK;
             });
             if (isShowSize)
                 sHorizontalProgressDialog.setProgressNumberFormat("%2dMB/%1dMB");

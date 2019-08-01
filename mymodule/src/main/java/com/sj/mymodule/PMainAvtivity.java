@@ -3,7 +3,7 @@ package com.sj.mymodule;
 import android.app.Activity;
 import android.os.Bundle;
 
-public class PushLAvtivity extends Activity {
+public class PMainAvtivity extends Activity {
     @Override
     protected void onCreate( Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

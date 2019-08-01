@@ -45,7 +45,6 @@ public class SharedPreferencesUtil {
         return prefsUtil;
     }
 
-    @SuppressLint("CommitPrefEdits")
     public static void init(Context context, String prefsname, int mode) {
         prefsUtil = new SharedPreferencesUtil();
         prefsUtil.context = context;

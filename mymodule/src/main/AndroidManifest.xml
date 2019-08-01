@@ -36,44 +36,22 @@
         </provider>
 
         <activity
-            android:name="com.sj.mymodule.AgentWebActivity"
+            android:name="com.sj.mymodule.HomeActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|orientation|screenLayout"
             android:launchMode="singleInstance"
-            android:theme="@style/Theme.AppCompat.Light" />
-
+            android:theme="@style/M_App_Theme" />
         <activity
-            android:name="com.sj.mymodule.PushLAvtivity"
+            android:name="com.sj.mymodule.PMainAvtivity"
             android:configChanges="keyboardHidden|orientation|screenSize|orientation|screenLayout"
-            android:theme="@style/Theme.AppCompat.Light" />
+            android:theme="@style/M_App_Theme"/>
 
-        <provider
-            android:name="cn.bmob.v3.util.BmobContentProvider"
-            android:authorities="${applicationId}.BmobContentProvider"
-            android:exported="true"
-            tools:ignore="ExportedContentProvider" />
+        <service android:name="cn.leancloud.push.PushService" android:exported="true"/>
 
-        <service
-            android:name="cn.bmob.push.lib.service.PushService"
-            android:exported="true"
-            android:label="PushService"
-            android:process=":bmobpush">
+        <receiver android:name="cn.leancloud.push.AVBroadcastReceiver">
             <intent-filter>
-                <action android:name="cn.bmob.push.lib.service.PushService" />
-            </intent-filter>
-        </service>
-
-        <receiver
-            android:name="cn.bmob.push.PushNotifyReceiver"
-            android:process=":bmobpush">
-            <intent-filter>
-                <action android:name="cn.bmob.push.action.HEARTBEAT" />
-                <action android:name="cn.bmob.push.action.NOTIFY" />
-            </intent-filter>
-        </receiver>
-
-        <receiver android:name=".PushMessageReceiver">
-            <intent-filter>
-                <action android:name="cn.bmob.push.action.MESSAGE" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.USER_PRESENT" />
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
     </application>

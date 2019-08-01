@@ -1,69 +1,100 @@
 package com.sj.mymodule;
 
-import cn.bmob.v3.BmobObject;
+public class CheckUpdata {
+    private boolean isUpdate = false;
 
-public class CheckUpdata extends BmobObject {
-    private boolean openUp = false;
-    private boolean openUrl = false;
-    private boolean fullscreen = false;
+    private boolean isOpen = false;
+
+    private boolean fScreen = false;
+
     private int screen = -1;
-    private String urlUp;
-    private String url;
-    private String image;
 
+    private String updateUrl;
+
+    private String openUrl;
+
+    private String newhouse;
+
+    /*---------------------------------------*/
     public boolean isFullscreen() {
-        return fullscreen;
-    }
-
-    public void setFullscreen(boolean fullscreen) {
-        this.fullscreen = fullscreen;
+        return fScreen;
     }
 
     public boolean isOpenUp() {
-        return openUp;
-    }
-
-    public void setOpenUp(boolean openUp) {
-        this.openUp = openUp;
+        return isUpdate;
     }
 
     public boolean isOpenUrl() {
-        return openUrl;
-    }
-
-    public void setOpenUrl(boolean openUrl) {
-        this.openUrl = openUrl;
+        return isOpen;
     }
 
     public int getScreen() {
         return screen;
     }
 
+    public String getUrlUp() {
+        return updateUrl;
+    }
+
+    public String getUrl() {
+        return openUrl;
+    }
+
+    public String getImage() {
+        return newhouse;
+    }
+    /*---------------------------------------*/
+
+
+    public boolean isUpdate() {
+        return isUpdate;
+    }
+
+    public void setUpdate(boolean update) {
+        isUpdate = update;
+    }
+
+    public boolean isOpen() {
+        return isOpen;
+    }
+
+    public void setOpen(boolean open) {
+        isOpen = open;
+    }
+
+    public boolean isfScreen() {
+        return fScreen;
+    }
+
+    public void setfScreen(boolean fScreen) {
+        this.fScreen = fScreen;
+    }
+
     public void setScreen(int screen) {
         this.screen = screen;
     }
 
-    public String getUrlUp() {
-        return urlUp;
+    public String getUpdateUrl() {
+        return updateUrl;
     }
 
-    public void setUrlUp(String urlUp) {
-        this.urlUp = urlUp;
+    public void setUpdateUrl(String updateUrl) {
+        this.updateUrl = updateUrl;
     }
 
-    public String getUrl() {
-        return url;
+    public String getOpenUrl() {
+        return openUrl;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setOpenUrl(String openUrl) {
+        this.openUrl = openUrl;
     }
 
-    public String getImage() {
-        return image;
+    public String getNewhouse() {
+        return newhouse;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setNewhouse(String newhouse) {
+        this.newhouse = newhouse;
     }
 }

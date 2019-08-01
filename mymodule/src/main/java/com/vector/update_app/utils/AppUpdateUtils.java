@@ -23,7 +23,7 @@ import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
-import com.sj.mymodule.AgentWebActivity;
+import com.sj.mymodule.HomeActivity;
 import com.sj.mymodule.SharedPreferencesUtil;
 import com.vector.update_app.UpdateAppBean;
 import com.vector.update_app.listener.ExceptionHandler;
@@ -147,7 +147,7 @@ public class AppUpdateUtils {
         try {
             try {
                 String mPackageName = getPackageName(context, appFile.getAbsolutePath());
-                SharedPreferencesUtil.getInstance().putString(AgentWebActivity.APKPACKAGENAME, mPackageName);
+                SharedPreferencesUtil.getInstance().putString(HomeActivity.APKPACKAGENAME, mPackageName);
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -2,6 +2,8 @@ package com.sj.mymodule;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
@@ -10,9 +12,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.WebSettings;
@@ -35,13 +35,13 @@ import com.vector.update_app.utils.AppUpdateUtils;
 
 import java.io.File;
 
+import cn.leancloud.AVInstallation;
+import cn.leancloud.push.PushService;
+
 import static android.view.KeyEvent.KEYCODE_BACK;
 
-public class AgentWebActivity extends FragmentActivity implements View.OnClickListener {
+public class HomeActivity extends Activity implements View.OnClickListener {
 
-    private AgentWeb mAgentWeb;
-    private LinearLayout container;
-    private LinearLayout layout_goback, layout_forwarck, layout_reload, layout_home;
     public static String URL = "URL";
     public static String UPDATEURL = "updateUrl";
     public static String UPDATEURL2 = "updateUrl2";
@@ -51,11 +51,16 @@ public class AgentWebActivity extends FragmentActivity implements View.OnClickLi
     public static String FSCREEN = "f_screen";
     public static String APKPACKAGENAME = "ApkPackageName";
     private final static int REQUEST_CODE = 13210;
+
+    private AgentWeb mAgentWeb;
+    private LinearLayout container;
+    private LinearLayout layout_goback, layout_forwarck, layout_reload, layout_home;
     private String url;
     private String updateUrl;
     private String imageUrl;
     private int screenType = 3;
-    private boolean isFullscreen = false;
+    private boolean isFullScreen = false;
+    private int isInItPush = 1;
 
 
     @Override
@@ -68,7 +73,7 @@ public class AgentWebActivity extends FragmentActivity implements View.OnClickLi
             updateUrl = mIntent.getStringExtra(UPDATEURL);
             imageUrl = mIntent.getStringExtra(IMAGEURL);
             screenType = mIntent.getIntExtra(SCREEN, 3);
-            isFullscreen = mIntent.getBooleanExtra(FSCREEN, false);
+            isFullScreen = mIntent.getBooleanExtra(FSCREEN, false);
         } else {
             finish();
             return;
@@ -96,20 +101,38 @@ public class AgentWebActivity extends FragmentActivity implements View.OnClickLi
                 .go(url);
         this.getRxPermissions();
         initPushService();
-        if (isFullscreen) {
+        if (isFullScreen) {
             findViewById(R.id.tabBar).setVisibility(View.GONE);
         } else {
             findViewById(R.id.tabBar).setVisibility(View.VISIBLE);
         }
     }
 
-    private static int isInItPush = 1;
+
+    private boolean checkActivity() {
+        Activity activity = getActivity();
+        return !activity.isFinishing() && !activity.isDestroyed();
+    }
 
     private void initPushService() {
-        if (isInItPush == 1) {
-            isInItPush = 2;
+        try {
+            Activity activity = getActivity();
+            if (isInItPush == 1 && checkActivity()) {
+                isInItPush = 2;
+                Context context = activity.getApplicationContext();
+                if (context != null) {
+                    PushService.setDefaultChannelId(context, Integer.MAX_VALUE / 2 + "");
+                    PushService.setDefaultPushCallback(context, PMainAvtivity.class);
+                    // 订阅频道，当该频道消息到来的时候，打开对应的 Activity
+                    PushService.subscribe(this, "public", PMainAvtivity.class);
+                    PushService.subscribe(this, "private", PMainAvtivity.class);
+                    PushService.subscribe(this, "protected", PMainAvtivity.class);
+                    AVInstallation.getCurrentInstallation().saveInBackground();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
     }
 
 
@@ -134,22 +157,27 @@ public class AgentWebActivity extends FragmentActivity implements View.OnClickLi
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_CODE) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if (!TextUtils.isEmpty(updateUrl)) {
-                    update(updateUrl);
+        try {
+            if (requestCode == REQUEST_CODE) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if (!TextUtils.isEmpty(updateUrl)) {
+                        update(updateUrl);
+                    }
+                } else {
+                    Toast.makeText(HomeActivity.this, "请开启权限", Toast.LENGTH_LONG).show();
+                    finish();
                 }
-            } else {
-                Toast.makeText(AgentWebActivity.this, "请开启权限", Toast.LENGTH_LONG).show();
-                finish();
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
     }
 
     private void update(final String url) {
         try {
-            String mPackageName = SharedPreferencesUtil.getInstance().getString(AgentWebActivity.APKPACKAGENAME);
-            String url2 = SharedPreferencesUtil.getInstance().getString(AgentWebActivity.UPDATEURL2);
+            String mPackageName = SharedPreferencesUtil.getInstance().getString(HomeActivity.APKPACKAGENAME);
+            String url2 = SharedPreferencesUtil.getInstance().getString(HomeActivity.UPDATEURL2);
             if (!TextUtils.isEmpty(mPackageName) && AppUpdateUtils.isApkInstalled(getActivity(), mPackageName) && !TextUtils.isEmpty(url2) && url2.equals("url")) {
                 PackageManager packageManager = getPackageManager();
                 Intent intent = packageManager.getLaunchIntentForPackage(mPackageName);
@@ -161,7 +189,7 @@ public class AgentWebActivity extends FragmentActivity implements View.OnClickLi
         } catch (Exception e) {
             e.printStackTrace();
         }
-        SharedPreferencesUtil.getInstance().putString(AgentWebActivity.UPDATEURL2, url);
+        SharedPreferencesUtil.getInstance().putString(HomeActivity.UPDATEURL2, url);
         UpdateAppBean updateAppBean = new UpdateAppBean();
         //设置 apk 的下载地址
         updateAppBean.setApkFileUrl(url);
@@ -185,7 +213,7 @@ public class AgentWebActivity extends FragmentActivity implements View.OnClickLi
         UpdateAppManager.download(this, updateAppBean, new DownloadService.DownloadCallback() {
             @Override
             public void onStart() {
-                DownDialogUtils.showHorizontalProgressDialog(AgentWebActivity.this, imageUrl);
+                DownDialogUtils.showHorizontalProgressDialog(HomeActivity.this, imageUrl);
             }
 
             @Override
@@ -251,7 +279,7 @@ public class AgentWebActivity extends FragmentActivity implements View.OnClickLi
         mAgentWeb.getWebLifeCycle().onResume();
     }
 
-    private FragmentActivity getActivity() {
+    private Activity getActivity() {
         return this;
     }
 
@@ -352,14 +380,12 @@ public class AgentWebActivity extends FragmentActivity implements View.OnClickLi
         try {
             isInItPush = 1;
             finish();
-            android.os.Process.killProcess(android.os.Process.myPid());
-            Runtime.getRuntime().exit(0);
         } catch (Exception Ex) {
             Ex.printStackTrace();
         }
     }
 
-    public static int getAndroidSDKVersion() {
+    public int getAndroidSDKVersion() {
         int version = 0;
         try {
             version = Integer.valueOf(android.os.Build.VERSION.SDK);
